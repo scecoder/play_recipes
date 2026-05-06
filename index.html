@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Offline Streamlit</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable/build/stlite.css" />
+    <link rel="manifest" href="manifest.json" />
+    <script>
+      // This part handles the "Offline" logic
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js');
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable/build/stlite.js"></script>
+    <script>
+      stlite.mount({
+        entrypoint: "app.py",
+        files: {
+          "app.py": `
+import streamlit as st
+st.title("My Offline App")
+st.write("If you see this, Python is running in your browser!")
+          `
+        }
+      }, document.getElementById("root"));
+    </script>
+  </body>
+</html>
