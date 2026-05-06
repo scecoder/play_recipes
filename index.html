@@ -2,32 +2,41 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Offline Streamlit</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable/build/stlite.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>My Offline App</title>
+    <!-- stlite CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.60.0/build/stlite.css" />
+    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json" />
-    <script>
-      // This part handles the "Offline" logic
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js');
-        });
-      }
-    </script>
+    <!-- Mobile meta tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
   </head>
   <body>
     <div id="root"></div>
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable/build/stlite.js"></script>
+    <!-- stlite Bootstrapper -->
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.60.0/build/stlite.js"></script>
     <script>
       stlite.mount({
+        requirements: ["pandas"], // Add any other libraries from your requirements.txt here
         entrypoint: "app.py",
         files: {
-          "app.py": `
-import streamlit as st
-st.title("My Offline App")
-st.write("If you see this, Python is running in your browser!")
-          `
-        }
+          "app.py": {
+            url: "app.py", // This pulls the actual code from your repo
+          },
+        },
       }, document.getElementById("root"));
+    </script>
+    
+    <!-- Service Worker Registration for Offline Mode -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(reg => console.log('Offline cache ready!', reg))
+            .catch(err => console.error('Offline cache failed:', err));
+        });
+      }
     </script>
   </body>
 </html>
