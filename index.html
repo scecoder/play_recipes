@@ -95,6 +95,7 @@
         .recipe-card h3 {
             color: #ff6b6b;
             margin-bottom: 8px;
+            font-size: 16px;
         }
         
         .recipe-card .meta {
@@ -334,15 +335,77 @@
     </div>
     
     <script>
-        // Initialize data
+        // Initialize data with all recipes from app.py
         const STORAGE_KEY = 'offline_recipes';
         const SHOPPING_KEY = 'offline_shopping';
         
         let recipes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+            // STOVETOP
             {"name": "Beef & Cabbage Skillet", "type": "Entree", "method": "Stovetop", "ingredients": "1lb Ground Beef, 1/2 Cabbage, Butter, Cumin", "instructions": "Brown beef in butter. Add shredded cabbage and cumin. Cook until soft."},
-            {"name": "Lemon Shrimp Zucchini", "type": "Entree", "method": "Stovetop", "ingredients": "Shrimp, Zucchini, Lemon, Garlic, Butter", "instructions": "Sauté shrimp in butter. Remove. Toss zucchini with lemon and garlic."},
+            {"name": "Zucchini Beef Hash", "type": "Entree", "method": "Stovetop", "ingredients": "2 Zucchini, 1lb Beef, Chili Powder, Tallow", "instructions": "Dice zucchini. Fry with beef and chili powder."},
+            {"name": "Garlic Butter Steak & Mushrooms", "type": "Entree", "method": "Stovetop", "ingredients": "Sirloin, Mushrooms, Butter, Garlic", "instructions": "Sear steak in butter. Add mushrooms and garlic."},
+            {"name": "Creamy Broccoli Chicken", "type": "Entree", "method": "Stovetop", "ingredients": "Chicken, Broccoli, Heavy Cream, Parmesan", "instructions": "Sauté chicken. Add broccoli and cream sauce."},
+            {"name": "Latin Turkey Fry", "type": "Entree", "method": "Stovetop", "ingredients": "Turkey, Peppers, Oregano, Cumin, Olive Oil", "instructions": "Sauté peppers in oil. Add turkey and spices."},
+            {"name": "Beef Chorizo Cabbage", "type": "Entree", "method": "Stovetop", "ingredients": "Beef Chorizo, Cabbage, Butter", "instructions": "Fry chorizo. Add cabbage. Cook in rendered fat."},
+            {"name": "Lemon Shrimp Zucchini", "type": "Entree", "method": "Stovetop", "ingredients": "Shrimp, Zucchini, Lemon, Garlic, Butter", "instructions": "Sauté shrimp in butter. Toss zucchini with lemon and garlic."},
+            {"name": "Mushroom Swiss Burgers", "type": "Entree", "method": "Stovetop", "ingredients": "Beef Patties, Mushrooms, Swiss, Butter", "instructions": "Fry patties. Sauté mushrooms in drippings."},
+            {"name": "Cajun Chicken & Peppers", "type": "Entree", "method": "Stovetop", "ingredients": "Chicken, Bell Peppers, Paprika, Cayenne, Butter", "instructions": "Season chicken. Fry with peppers and spices."},
+            {"name": "Cheesy Cauliflower Beef", "type": "Entree", "method": "Stovetop", "ingredients": "Beef, Cauliflower Rice, Jack Cheese, Garlic Salt", "instructions": "Brown beef. Stir in cauliflower rice and cheese."},
+            {"name": "Taco Turkey Skillet", "type": "Entree", "method": "Stovetop", "ingredients": "Turkey, Taco Spice, Onion, Butter", "instructions": "Brown turkey with onions and spices."},
+            {"name": "Garlic Scallop Saute", "type": "Entree", "method": "Stovetop", "ingredients": "Scallops, Garlic, Parsley, Butter", "instructions": "Sear scallops 2 mins per side in hot butter and garlic."},
+            {"name": "Pepper Steak Strips", "type": "Entree", "method": "Stovetop", "ingredients": "Flank Steak, Bell Peppers, Onion, Pepper, Olive Oil", "instructions": "Flash fry steak strips. Add peppers and onion."},
+            {"name": "Mushroom Cream Steak", "type": "Entree", "method": "Stovetop", "ingredients": "Steak, Mushrooms, Heavy Cream, Thyme", "instructions": "Pan sear steak. Make cream sauce with mushrooms."},
+            {"name": "Lime Butter Chicken Thighs", "type": "Entree", "method": "Stovetop", "ingredients": "Chicken Thighs, Lime, Cumin, Butter", "instructions": "Crisp chicken skin in butter. Add lime and cumin."},
+            {"name": "Cabbage & Beef Chorizo Fry", "type": "Entree", "method": "Stovetop", "ingredients": "Cabbage, Beef Chorizo, Red Pepper, Tallow", "instructions": "Sauté peppers and cabbage. Mix with chorizo."},
+            {"name": "Chicken Piccata (Keto)", "type": "Entree", "method": "Stovetop", "ingredients": "Chicken, Capers, Lemon, Butter", "instructions": "Pan fry chicken. Deglaze with lemon and capers."},
+            // OVEN
+            {"name": "Stuffed Zucchini Boats", "type": "Entree", "method": "Oven", "ingredients": "Zucchini, Beef, Marinara, Mozzarella", "instructions": "Hollow zucchini. Fill with cooked beef and sauce. Bake 375°F."},
             {"name": "Sheet Pan Chicken & Broccoli", "type": "Entree", "method": "Oven", "ingredients": "Chicken, Broccoli, Olive Oil, Paprika", "instructions": "Toss on pan. Bake 425°F for 25 mins."},
+            {"name": "Walnut Cod Bake", "type": "Entree", "method": "Oven", "ingredients": "Cod, Walnuts, Butter, Lemon", "instructions": "Crust cod with walnuts. Bake 375°F for 15 mins."},
+            {"name": "Beef Meatloaf", "type": "Entree", "method": "Oven", "ingredients": "Beef, Almond Flour, Egg, Garlic Powder", "instructions": "Mix and shape. Bake 350°F for 45 mins."},
+            {"name": "Cheesy Cabbage Bake", "type": "Entree", "method": "Oven", "ingredients": "Cabbage, Cream, Cheddar, Butter", "instructions": "Layer cabbage and cream. Top with cheese. Bake 375°F."},
+            {"name": "Baked Enchilada Chicken", "type": "Entree", "method": "Oven", "ingredients": "Chicken, Enchilada Sauce, Jack Cheese", "instructions": "Smother chicken in sauce and cheese. Bake 400°F."},
+            {"name": "Roasted Beef & Radishes", "type": "Entree", "method": "Oven", "ingredients": "Beef Roast, Radishes, Tallow, Garlic", "instructions": "Sear roast. Bake with radishes at 325°F."},
+            {"name": "Parmesan Chicken Wings", "type": "Entree", "method": "Oven", "ingredients": "Wings, Parmesan, Garlic Salt, Olive Oil", "instructions": "Toss and bake at 400°F for 35 mins."},
+            {"name": "Salmon Asparagus Sheet Pan", "type": "Entree", "method": "Oven", "ingredients": "Salmon, Asparagus, Lemon, Olive Oil", "instructions": "Bake everything together at 400°F for 12 mins."},
+            {"name": "Stuffed Mushroom Caps", "type": "Entree", "method": "Oven", "ingredients": "Large Mushrooms, Cream Cheese, Cheddar", "instructions": "Fill caps. Bake at 350°F for 15 mins."},
+            {"name": "Beef Bacon Chicken Cordon Bleu", "type": "Entree", "method": "Oven", "ingredients": "Chicken, Beef Bacon, Swiss, Butter", "instructions": "Wrap chicken in bacon. Bake 375°F."},
+            {"name": "Tex-Mex Meatball Bake", "type": "Entree", "method": "Oven", "ingredients": "Beef Meatballs, Chili Powder, Jack Cheese", "instructions": "Bake meatballs. Top with cheese and spices."},
+            {"name": "Garlic Tilapia Bundles", "type": "Entree", "method": "Oven", "ingredients": "Tilapia, Butter, Garlic, Foil", "instructions": "Seal in foil. Bake 375°F for 15 mins."},
+            // AIR FRYER
+            {"name": "AF Chili Lime Salmon", "type": "Entree", "method": "Air Fryer", "ingredients": "Salmon, Lime, Chili Powder, Olive Oil", "instructions": "Air fry 400°F for 8 mins."},
+            {"name": "AF Steak Bites", "type": "Entree", "method": "Air Fryer", "ingredients": "Steak, Garlic Salt, Tallow", "instructions": "Air fry 400°F for 7 mins. Shake once."},
+            {"name": "AF Crispy Broccoli", "type": "Entree", "method": "Air Fryer", "ingredients": "Broccoli, Olive Oil, Parmesan", "instructions": "Air fry 375°F for 8 mins."},
+            {"name": "AF Lemon Wings", "type": "Entree", "method": "Air Fryer", "ingredients": "Wings, Lemon Pepper, Olive Oil", "instructions": "Air fry 380°F for 20 mins."},
+            {"name": "AF Zucchini Fries", "type": "Entree", "method": "Air Fryer", "ingredients": "Zucchini, Almond Flour, Egg", "instructions": "Bread zucchini. Air fry 375°F for 12 mins."},
+            {"name": "AF Bunless Burgers", "type": "Entree", "method": "Air Fryer", "ingredients": "Beef Patties, Salt, Cheddar", "instructions": "Air fry 375°F for 10 mins."},
+            {"name": "AF Stuffed Peppers", "type": "Entree", "method": "Air Fryer", "ingredients": "Peppers, Ground Turkey, Cheese", "instructions": "Fill peppers. Air fry 350°F for 15 mins."},
+            {"name": "AF Cabbage Wedges", "type": "Entree", "method": "Air Fryer", "ingredients": "Cabbage, Butter, Onion Powder", "instructions": "Air fry 350°F for 15 mins."},
+            {"name": "AF Garlic Mushrooms", "type": "Entree", "method": "Air Fryer", "ingredients": "Mushrooms, Butter, Garlic Powder", "instructions": "Air fry 375°F for 10 mins."},
+            {"name": "AF Turkey Meatballs", "type": "Entree", "method": "Air Fryer", "ingredients": "Turkey, Sage, Almond Flour", "instructions": "Air fry 375°F for 12 mins."},
+            // SIDES
+            {"name": "Bacon Maple Sprouts", "type": "Sides", "method": "Oven", "ingredients": "Brussels Sprouts, Bacon, Breadcrumbs, Maple Syrup", "instructions": "Roast 400°F for 20 mins until crispy."},
+            {"name": "AF Garlic Parm Broccoli", "type": "Sides", "method": "Air Fryer", "ingredients": "Broccoli, Pine Nuts, Crouton Crumbs, Parmesan", "instructions": "Air fry 375°F for 8 mins."},
+            {"name": "Sweet Potato Chorizo Hash", "type": "Sides", "method": "Stovetop", "ingredients": "Sweet Potato, Chorizo, Onions, Corn", "instructions": "Sauté in skillet until potato is tender."},
+            {"name": "Zucchini Almond Gratin", "type": "Sides", "method": "Oven", "ingredients": "Zucchini, Sliced Almonds, Panko, Garlic", "instructions": "Bake 375°F for 15 mins until golden."},
+            {"name": "Loaded Cauliflower Bites", "type": "Sides", "method": "Air Fryer", "ingredients": "Cauliflower, Bacon Bits, Potato Cubes, Chives", "instructions": "Air fry 400°F for 15 mins."},
+            {"name": "Pecan Green Beans", "type": "Sides", "method": "Stovetop", "ingredients": "Green Beans, Pecans, Dried Cranberries, Butter", "instructions": "Sauté beans. Toss with nuts and cranberries."},
+            // BREAKFASTS
             {"name": "Blueberry Overnight Oats", "type": "Breakfast", "method": "Fridge", "ingredients": "Oats, Milk, Blueberries, Honey", "instructions": "Mix in jar. Refrigerate overnight."},
+            {"name": "Beef Breakfast Burrito", "type": "Breakfast", "method": "Fridge", "ingredients": "Flour Tortilla, Beef, Egg, Cheese", "instructions": "Roll and wrap in foil. Reheat in AM."},
+            {"name": "Yogurt Walnut Parfait", "type": "Breakfast", "method": "Fridge", "ingredients": "Yogurt, Walnuts, Honey", "instructions": "Layer in jar. Keep cold."},
+            {"name": "Chia Seed Pudding", "type": "Breakfast", "method": "Fridge", "ingredients": "Chia, Milk, Vanilla, Stevia", "instructions": "Soak overnight in fridge."},
+            {"name": "Hard Boiled Egg Pack", "type": "Breakfast", "method": "Fridge", "ingredients": "Eggs, Salt, Apple Slices", "instructions": "Boil eggs ahead. Pack with fruit."},
+            {"name": "Ham & Cheese Crepes", "type": "Breakfast", "method": "Fridge", "ingredients": "Flour, Milk, Egg, Ham, Swiss", "instructions": "Cook crepes. Fill and roll. Store cold."},
+            {"name": "Apple Cinnamon Oats", "type": "Breakfast", "method": "Fridge", "ingredients": "Oats, Milk, Apple, Cinnamon", "instructions": "Mix in jar. Store overnight."},
+            {"name": "Strawberry Yogurt Bowl", "type": "Breakfast", "method": "Fridge", "ingredients": "Yogurt, Strawberries, Almonds", "instructions": "Prep in container. Refrigerate."},
+            {"name": "Turkey Sausage Wrap", "type": "Breakfast", "method": "Fridge", "ingredients": "Tortilla, Turkey Sausage, Egg", "instructions": "Cook and wrap. Reheat as needed."},
+            {"name": "Peanut Butter Oats", "type": "Breakfast", "method": "Fridge", "ingredients": "Oats, Milk, Peanut Butter", "instructions": "Mix and refrigerate."},
+            {"name": "Egg & Beef Muffins", "type": "Breakfast", "method": "Oven", "ingredients": "Eggs, Beef, Spinach", "instructions": "Bake in muffin tin at 350°F for 20 mins."},
+            {"name": "Sheet Pan Pancakes", "type": "Breakfast", "method": "Oven", "ingredients": "Flour, Milk, Egg, Syrup", "instructions": "Bake batter on sheet at 425°F for 15 mins."},
+            {"name": "Baked Oatmeal Bars", "type": "Breakfast", "method": "Oven", "ingredients": "Oats, Banana, Walnuts", "instructions": "Bake in pan at 350°F for 25 mins."},
+            {"name": "Turkey Breakfast Bake", "type": "Breakfast", "method": "Oven", "ingredients": "Eggs, Turkey, Peppers", "instructions": "Bake in dish at 375°F for 25 mins."},
+            {"name": "Mini Quiches", "type": "Breakfast", "method": "Oven", "ingredients": "Flour Crust, Eggs, Cheese", "instructions": "Bake in mini tin at 350°F for 20 mins."}
         ];
         
         let shoppingList = JSON.parse(localStorage.getItem(SHOPPING_KEY)) || [];
@@ -592,6 +655,9 @@
                 reg => console.log('✅ Offline mode ready!')
             ).catch(err => console.log('ℹ️ Offline mode info:', err.message));
         }
+        
+        // Initial render
+        renderHome();
     </script>
 </body>
 </html>
