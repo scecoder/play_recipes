@@ -1,42 +1,597 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline Recipes</title>
-    <!-- stlite CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.60.0/build/stlite.css" />
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json" />
-    <!-- Mobile meta tags -->
+    <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  </head>
-  <body>
-    <div id="root"></div>
-    <!-- stlite Bootstrapper -->
-    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.60.0/build/stlite.js"></script>
-    <script>
-      stlite.mount({
-        requirements: [], // Offline app - minimal dependencies
-        entrypoint: "offline_app.py",
-        files: {
-          "offline_app.py": {
-            url: "offline_app.py",
-          },
-        },
-      }, document.getElementById("root"));
-    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 10px;
+        }
+        
+        .header {
+            background: #ff6b6b;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .nav button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            background: #fff;
+            cursor: pointer;
+            font-weight: 500;
+            border: 2px solid #ddd;
+            transition: all 0.2s;
+        }
+        
+        .nav button.active {
+            background: #ff6b6b;
+            color: white;
+            border-color: #ff6b6b;
+        }
+        
+        .nav button:hover {
+            border-color: #ff6b6b;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        
+        .recipe-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .recipe-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .recipe-card h3 {
+            color: #ff6b6b;
+            margin-bottom: 8px;
+        }
+        
+        .recipe-card .meta {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+        
+        .recipe-detail {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .recipe-detail h2 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+        
+        .recipe-detail h3 {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+        
+        .recipe-detail p {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #ff6b6b;
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background: #ff5252;
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+            flex: 1;
+        }
+        
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+        
+        .btn-danger {
+            background: #d32f2f;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c62828;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .shopping-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .shopping-item button {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        
+        .search-box {
+            margin-bottom: 15px;
+        }
+        
+        .search-box input {
+            width: 100%;
+        }
+        
+        .info {
+            background: #e3f2fd;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            color: #1565c0;
+        }
+        
+        .success {
+            background: #e8f5e9;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📖 Offline Recipes</h1>
+        </div>
+        
+        <div class="nav">
+            <button class="nav-btn active" data-page="home">🏠 Home</button>
+            <button class="nav-btn" data-page="add">➕ Add</button>
+            <button class="nav-btn" data-page="shopping">🛒 List</button>
+            <button class="nav-btn" data-page="import">📤 Import/Export</button>
+        </div>
+        
+        <!-- HOME PAGE -->
+        <div id="home" class="page active">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search recipes...">
+            </div>
+            <div id="recipeGrid" class="recipe-grid"></div>
+        </div>
+        
+        <!-- DETAIL PAGE -->
+        <div id="detail" class="page">
+            <div id="recipeDetail"></div>
+        </div>
+        
+        <!-- ADD RECIPE PAGE -->
+        <div id="add" class="page">
+            <div class="recipe-detail">
+                <h2>➕ Add New Recipe</h2>
+                <form id="addForm">
+                    <div class="form-group">
+                        <label>Recipe Name</label>
+                        <input type="text" id="addName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="addType">
+                            <option>Entree</option>
+                            <option>Breakfast</option>
+                            <option>Sides</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Method</label>
+                        <select id="addMethod">
+                            <option>Stovetop</option>
+                            <option>Oven</option>
+                            <option>Air Fryer</option>
+                            <option>Fridge</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ingredients</label>
+                        <textarea id="addIngredients" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Instructions</label>
+                        <textarea id="addInstructions" required></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%;">Create Recipe</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- SHOPPING LIST PAGE -->
+        <div id="shopping" class="page">
+            <div id="shoppingList"></div>
+        </div>
+        
+        <!-- IMPORT/EXPORT PAGE -->
+        <div id="import" class="page">
+            <div class="recipe-detail">
+                <h2>📤 Import/Export</h2>
+                
+                <h3>📥 Export Recipes</h3>
+                <p>Download all recipes as JSON:</p>
+                <button id="exportBtn" class="btn-primary" style="width: 100%;">⬇️ Download (JSON)</button>
+                
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
+                
+                <h3>📤 Import Recipes</h3>
+                <p>Upload a JSON file to add recipes:</p>
+                <input type="file" id="importFile" accept=".json" style="margin-bottom: 10px;">
+                <button id="importBtn" class="btn-primary" style="width: 100%;">Upload</button>
+                <div id="importStatus"></div>
+            </div>
+        </div>
+    </div>
     
-    <!-- Service Worker Registration for Offline Mode -->
     <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('✅ Offline mode ready!', reg))
-            .catch(err => console.error('❌ Offline setup failed:', err));
+        // Initialize data
+        const STORAGE_KEY = 'offline_recipes';
+        const SHOPPING_KEY = 'offline_shopping';
+        
+        let recipes = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [
+            {"name": "Beef & Cabbage Skillet", "type": "Entree", "method": "Stovetop", "ingredients": "1lb Ground Beef, 1/2 Cabbage, Butter, Cumin", "instructions": "Brown beef in butter. Add shredded cabbage and cumin. Cook until soft."},
+            {"name": "Lemon Shrimp Zucchini", "type": "Entree", "method": "Stovetop", "ingredients": "Shrimp, Zucchini, Lemon, Garlic, Butter", "instructions": "Sauté shrimp in butter. Remove. Toss zucchini with lemon and garlic."},
+            {"name": "Sheet Pan Chicken & Broccoli", "type": "Entree", "method": "Oven", "ingredients": "Chicken, Broccoli, Olive Oil, Paprika", "instructions": "Toss on pan. Bake 425°F for 25 mins."},
+            {"name": "Blueberry Overnight Oats", "type": "Breakfast", "method": "Fridge", "ingredients": "Oats, Milk, Blueberries, Honey", "instructions": "Mix in jar. Refrigerate overnight."},
+        ];
+        
+        let shoppingList = JSON.parse(localStorage.getItem(SHOPPING_KEY)) || [];
+        let currentPage = 'home';
+        let selectedRecipeIdx = -1;
+        
+        // Save data to localStorage
+        function saveRecipes() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+        }
+        
+        function saveShoppingList() {
+            localStorage.setItem(SHOPPING_KEY, JSON.stringify(shoppingList));
+        }
+        
+        // Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const page = e.target.dataset.page;
+                showPage(page);
+            });
         });
-      }
+        
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(page).classList.add('active');
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+            
+            currentPage = page;
+            
+            if (page === 'home') renderHome();
+            if (page === 'shopping') renderShoppingList();
+            if (page === 'import') setupImportExport();
+        }
+        
+        // Render Home
+        function renderHome() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = recipes.filter(r => r.name.toLowerCase().includes(search));
+            
+            const grid = document.getElementById('recipeGrid');
+            grid.innerHTML = filtered.map((r, idx) => `
+                <div class="recipe-card" onclick="viewRecipe(${idx})">
+                    <h3>${r.name}</h3>
+                    <div class="meta">🏷️ ${r.type} • ⚙️ ${r.method}</div>
+                    <p style="font-size: 12px; color: #666;">${r.ingredients.substring(0, 50)}...</p>
+                </div>
+            `).join('');
+            
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="empty-state">No recipes found. Add one!</div>';
+            }
+        }
+        
+        // Search
+        document.getElementById('searchInput').addEventListener('input', renderHome);
+        
+        // View Recipe
+        function viewRecipe(idx) {
+            selectedRecipeIdx = idx;
+            const r = recipes[idx];
+            document.getElementById('detail').innerHTML = `
+                <div class="recipe-detail">
+                    <h2>${r.name}</h2>
+                    <div class="meta">🏷️ ${r.type} • ⚙️ ${r.method}</div>
+                    
+                    <h3>📋 Ingredients</h3>
+                    <p>${r.ingredients}</p>
+                    
+                    <h3>👨‍🍳 Instructions</h3>
+                    <p>${r.instructions}</p>
+                    
+                    <div class="button-group">
+                        <button class="btn-secondary" onclick="showPage('home')">🏠 Back</button>
+                        <button class="btn-primary" onclick="editRecipe(${idx})">✏️ Edit</button>
+                        <button class="btn-danger" onclick="deleteRecipe(${idx})">🗑️ Delete</button>
+                    </div>
+                    <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="addToShopping(${idx})">🛒 Add to List</button>
+                </div>
+            `;
+            showPage('detail');
+        }
+        
+        // Edit Recipe
+        function editRecipe(idx) {
+            const r = recipes[idx];
+            const detail = document.getElementById('detail');
+            detail.innerHTML = `
+                <div class="recipe-detail">
+                    <h2>✏️ Edit Recipe</h2>
+                    <div class="form-group">
+                        <label>Recipe Name</label>
+                        <input type="text" id="editName" value="${r.name}">
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="editType">
+                            <option ${r.type === 'Entree' ? 'selected' : ''}>Entree</option>
+                            <option ${r.type === 'Breakfast' ? 'selected' : ''}>Breakfast</option>
+                            <option ${r.type === 'Sides' ? 'selected' : ''}>Sides</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Method</label>
+                        <select id="editMethod">
+                            <option ${r.method === 'Stovetop' ? 'selected' : ''}>Stovetop</option>
+                            <option ${r.method === 'Oven' ? 'selected' : ''}>Oven</option>
+                            <option ${r.method === 'Air Fryer' ? 'selected' : ''}>Air Fryer</option>
+                            <option ${r.method === 'Fridge' ? 'selected' : ''}>Fridge</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Ingredients</label>
+                        <textarea id="editIngredients">${r.ingredients}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Instructions</label>
+                        <textarea id="editInstructions">${r.instructions}</textarea>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn-secondary" onclick="viewRecipe(${idx})">Cancel</button>
+                        <button class="btn-primary" onclick="saveEdit(${idx})">Save</button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function saveEdit(idx) {
+            recipes[idx] = {
+                name: document.getElementById('editName').value,
+                type: document.getElementById('editType').value,
+                method: document.getElementById('editMethod').value,
+                ingredients: document.getElementById('editIngredients').value,
+                instructions: document.getElementById('editInstructions').value
+            };
+            saveRecipes();
+            viewRecipe(idx);
+        }
+        
+        // Delete Recipe
+        function deleteRecipe(idx) {
+            if (confirm('Delete this recipe?')) {
+                recipes.splice(idx, 1);
+                saveRecipes();
+                showPage('home');
+            }
+        }
+        
+        // Add to Shopping List
+        function addToShopping(idx) {
+            const r = recipes[idx];
+            shoppingList.push(`${r.name}: ${r.ingredients}`);
+            saveShoppingList();
+            alert('Added to shopping list!');
+        }
+        
+        // Shopping List
+        function renderShoppingList() {
+            const list = document.getElementById('shoppingList');
+            if (shoppingList.length === 0) {
+                list.innerHTML = '<div class="empty-state">Your shopping list is empty.</div>';
+                return;
+            }
+            list.innerHTML = `
+                <div style="margin-bottom: 15px;">
+                    ${shoppingList.map((item, idx) => `
+                        <div class="shopping-item">
+                            <span>• ${item}</span>
+                            <button class="btn-secondary" onclick="removeFromShopping(${idx})">❌</button>
+                        </div>
+                    `).join('')}
+                </div>
+                <button class="btn-danger" style="width: 100%;" onclick="clearShopping()">Clear All</button>
+            `;
+        }
+        
+        function removeFromShopping(idx) {
+            shoppingList.splice(idx, 1);
+            saveShoppingList();
+            renderShoppingList();
+        }
+        
+        function clearShopping() {
+            if (confirm('Clear shopping list?')) {
+                shoppingList = [];
+                saveShoppingList();
+                renderShoppingList();
+            }
+        }
+        
+        // Add Recipe Form
+        document.getElementById('addForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            recipes.push({
+                name: document.getElementById('addName').value,
+                type: document.getElementById('addType').value,
+                method: document.getElementById('addMethod').value,
+                ingredients: document.getElementById('addIngredients').value,
+                instructions: document.getElementById('addInstructions').value
+            });
+            saveRecipes();
+            document.getElementById('addForm').reset();
+            alert('Recipe added!');
+            showPage('home');
+        });
+        
+        // Import/Export
+        function setupImportExport() {
+            document.getElementById('exportBtn').onclick = () => {
+                const json = JSON.stringify(recipes, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'recipes_backup.json';
+                a.click();
+            };
+            
+            document.getElementById('importBtn').onclick = () => {
+                const file = document.getElementById('importFile').files[0];
+                if (!file) {
+                    alert('Please select a file');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        recipes.push(...imported);
+                        saveRecipes();
+                        document.getElementById('importStatus').innerHTML = `<div class="success">✅ Imported ${imported.length} recipe(s)!</div>`;
+                        document.getElementById('importFile').value = '';
+                        setTimeout(() => showPage('home'), 1000);
+                    } catch (err) {
+                        document.getElementById('importStatus').innerHTML = `<div class="info">❌ Invalid JSON file</div>`;
+                    }
+                };
+                reader.readAsText(file);
+            };
+        }
+        
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').then(
+                reg => console.log('✅ Offline mode ready!')
+            ).catch(err => console.log('ℹ️ Offline mode info:', err.message));
+        }
     </script>
-  </body>
+</body>
 </html>
