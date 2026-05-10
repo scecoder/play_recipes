@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>My Offline App</title>
+    <title>Offline Recipes</title>
     <!-- stlite CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.60.0/build/stlite.css" />
     <!-- PWA Manifest -->
@@ -18,11 +18,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@0.60.0/build/stlite.js"></script>
     <script>
       stlite.mount({
-        requirements: ["pandas"], // Add any other libraries from your requirements.txt here
-        entrypoint: "app.py",
+        requirements: [], // Offline app - minimal dependencies
+        entrypoint: "offline_app.py",
         files: {
-          "app.py": {
-            url: "app.py", // This pulls the actual code from your repo
+          "offline_app.py": {
+            url: "offline_app.py",
           },
         },
       }, document.getElementById("root"));
@@ -33,8 +33,8 @@
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('./sw.js')
-            .then(reg => console.log('Offline cache ready!', reg))
-            .catch(err => console.error('Offline cache failed:', err));
+            .then(reg => console.log('✅ Offline mode ready!', reg))
+            .catch(err => console.error('❌ Offline setup failed:', err));
         });
       }
     </script>
